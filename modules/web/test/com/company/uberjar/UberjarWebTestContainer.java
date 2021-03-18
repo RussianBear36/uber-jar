@@ -9,8 +9,7 @@ public class UberjarWebTestContainer extends TestContainer {
 
     public UberjarWebTestContainer() {
         appComponents = Arrays.asList(
-                "com.haulmont.cuba",
-                "com.haulmont.addon.cubajm");
+                "com.haulmont.cuba");
         appPropertiesFiles = Arrays.asList(
                 // List the files defined in your web.xml
                 // in appPropertiesConfig context parameter of the web module

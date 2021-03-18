@@ -1,0 +1,51 @@
+version: '3'
+
+services:
+
+  nginx:
+    image: nginx:latest
+    depends_on:
+      - sales-web
+    volumes:
+      - ./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+    - 8070:8070
+
+  javamelody:
+    image: javamelody
+    ports:
+      - 1337:1337
+
+  postgres:
+    image: library/postgres:12.6
+    environment:
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=javamelodydb
+    ports:
+    - 5433:5432
+
+  sales-core:
+    image: cuba-sample-sales-core
+    environment:
+      - CUBA_DATASOURCE_HOST=postgres
+      - CUBA_DATASOURCE_PORT=5432
+      - CUBA_DATASOURCE_PASSWORD=1234
+      - CUBA_DATASOURCE_USER=postgres
+      - CUBA_DATASOURCE_DBNAME=javamelodydb
+      - CUBA_WEBHOSTNAME=sales-core
+      - CUBA_WEBPORT=8079
+      - CUBA_WEBCONTEXTNAME=app-core
+      - CUBAJM_MONITORINGSERVERURL=http://javamelody:1337
+    ports:
+      - 8099:8079
+
+  sales-web:
+    image: cuba-sample-sales-web
+    environment:
+      - CUBA_USELOCALSERVICEINVOCATION=false
+      - CUBA_WEBHOSTNAME=sales-web
+      - CUBA_WEBPORT=8080
+      - CUBA_WEBCONTEXTNAME=app
+      - CUBAJM_MONITORINGSERVERURL=http://javamelody:1337
+      - CUBA_CONNECTIONURLLIST=http://sales-core:8079/app-core
